@@ -19,7 +19,7 @@ def exe_deps(tmpdir_factory):
 def exe_no_deps(tmpdir_factory):
     workspace = VEnvWorkspace(tmpdir_factory.mktemp('build_exe'))
     workspace.install_dependencies()
-    workspace.install_pyinstaller()
+    # Do not install PyInstaller for this fixture to simulate environment without pyinstaller
     workspace.call_build_system("portable-exe", download_deps=False)
     return workspace
 
