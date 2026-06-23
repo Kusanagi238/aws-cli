@@ -227,8 +227,6 @@ def _build_and_inject_ac_index(build_dir, extracted_wheel_dir):
 
 
 def _build_ac_index(build_dir, rebuild=True):
-    from awscli.autocomplete.generator import generate_index
-
     ac_index_build_name = os.path.join(build_dir, "ac.index")
     if rebuild:
         _remove_file_if_exists(ac_index_build_name)
@@ -236,7 +234,16 @@ def _build_ac_index(build_dir, rebuild=True):
         return ac_index_build_name
 
     print("Generating auto-complete index")
-    generate_index(ac_index_build_name)
+    # Run the generator in an isolated subprocess so the backend process does not
+    # perform an import of package modules at build-time.
+    import subprocess
+    import sys
+
+    code = (
+        "from awscli.autocomplete.generator import generate_index; "
+        f"generate_index({ac_index_build_name!r})"
+    )
+    subprocess.check_call([sys.executable, "-c", code])
     return ac_index_build_name
 
 
