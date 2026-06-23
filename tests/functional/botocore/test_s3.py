@@ -2207,7 +2207,7 @@ def test_retries_reuse_request_checksum(
     }
     s3 = _create_s3_client(
         retries={
-            'max_attempts': 1,
+            'max_attempts': 2,
         }
     )
     with pytest.raises(ConnectionError):
@@ -3292,6 +3292,10 @@ def _create_s3_client(
         environ['AWS_SHARED_CREDENTIALS_FILE'] = 'no-exist-foo'
         session = create_session()
         session.config_filename = 'no-exist-foo'
+        if retries is None:
+            retries = {
+                'max_attempts': 2,
+            }
         config = Config(
             signature_version=signature_version,
             s3=s3_config,
